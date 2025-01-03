@@ -12,21 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const commander_1 = require("commander");
-const config_1 = require("./config");
-const os_1 = __importDefault(require("os"));
-const server_1 = require("./server");
-function main() {
+exports.parseYAMLConfig = parseYAMLConfig;
+exports.validateConfig = validateConfig;
+const promises_1 = __importDefault(require("node:fs/promises"));
+const yaml_1 = require("yaml");
+const configSchema_1 = require("./configSchema");
+function parseYAMLConfig(filePath) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a;
-        const program = new commander_1.Command();
-        program.option("-c, --config <path>").parse();
-        const options = program.opts();
-        if (!options.config)
-            process.exit(0);
-        const res = yield (0, config_1.parseYAMLConfig)(options.config);
-        const result = yield (0, config_1.validateConfig)(res);
-        yield (0, server_1.createServer)({ port: result.server.listen, workerCount: (_a = result.server.workers) !== null && _a !== void 0 ? _a : os_1.default.cpus.length, config: result });
+        const configFileContent = yield promises_1.default.readFile(filePath, "utf-8");
+        const configJSON = (0, yaml_1.parse)(configFileContent);
+        return JSON.stringify(configJSON);
     });
 }
-main();
+function validateConfig(configStr) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const validatedConfig = yield configSchema_1.rootConfigSchema.parseAsync(JSON.parse(configStr));
+        return validatedConfig;
+    });
+}
