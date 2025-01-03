@@ -1,3 +1,4 @@
+import { error } from "node:console";
 import { z } from "zod";
 
 const workerMessageSchema = z.object({
@@ -7,4 +8,12 @@ const workerMessageSchema = z.object({
   url: z.string(),
 });
 
+const workerReplySchema = z.object({
+  statusCode: z.number(),
+  isError: z.boolean(),
+  data: z.string().optional(),
+  errorMessage: z.string().optional(),
+});
+
 export type WorkerMessageType = z.infer<typeof workerMessageSchema>;
+export type WorkerReplyType = z.infer<typeof workerReplySchema>;

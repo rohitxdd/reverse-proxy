@@ -3,7 +3,7 @@ import { z } from "zod"
 
 const upstreamSchema = z.object({
     id: z.string().min(2),
-    url: z.string().url()
+    url: z.string()
 })
 
 const headerSchema = z.object({
